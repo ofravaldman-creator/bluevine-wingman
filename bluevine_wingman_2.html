@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bluevine Interview Wingman</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9f9f7;color:#1a1a1a;padding:2rem 1rem}
+#app{max-width:640px;margin:0 auto}
+h1{font-size:20px;font-weight:600;margin-bottom:4px}
+.sub{font-size:14px;color:#666;margin-bottom:1.5rem;line-height:1.6}
+.step{display:none}.step.active{display:block}
+label{font-size:13px;color:#555;display:block;margin-bottom:6px;margin-top:1.25rem}
+input,select,textarea{font-size:14px;color:#1a1a1a;background:#fff;border:1px solid #ddd;border-radius:8px;padding:9px 12px;width:100%;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#888}
+textarea{resize:vertical;min-height:72px}
+.btn{margin-top:1rem;font-size:14px;padding:9px 20px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#1a1a1a;cursor:pointer}
+.btn:hover{background:#f3f3f3}
+.btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.btn-primary:hover{background:#333}
+.card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px}
+.card h3{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:8px}
+.card p,.card li{font-size:13px;color:#555;line-height:1.6}
+.highlight{background:#f3f3f3;border-radius:8px;padding:10px 12px;font-size:13px;color:#1a1a1a;line-height:1.7;margin-top:8px}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;margin-bottom:10px;font-weight:500}
+.badge-blue{background:#E6F1FB;color:#0C447C}
+.badge-teal{background:#E1F5EE;color:#085041}
+.section-title{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.07em;margin:1.5rem 0 10px}
+.q-block{border-left:2px solid #ddd;padding:8px 12px;margin-bottom:10px}
+.q-block p{font-size:13px;color:#1a1a1a;line-height:1.6}
+.q-block .why{font-size:12px;color:#777;margin-top:4px}
+.divider{border:none;border-top:1px solid #eee;margin:1.5rem 0}
+.nav-row{display:flex;gap:8px;margin-top:1.5rem;flex-wrap:wrap}
+.score-row{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.score-row label{margin:0;min-width:160px;font-size:13px;color:#1a1a1a}
+.score-btn{font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid #ddd;background:#fff;color:#777;cursor:pointer}
+.score-btn.selected{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.scorecard{background:#f3f3f3;border-radius:12px;padding:1.25rem;margin-top:1rem;font-size:13px;line-height:1.8;color:#1a1a1a;white-space:pre-wrap;font-family:'Courier New',monospace}
+.copy-btn{margin-top:8px;font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid #ddd;background:#fff;color:#555;cursor:pointer}
+.copy-btn:hover{background:#f3f3f3}
+.progress{display:flex;gap:4px;margin-bottom:1.5rem}
+.pdot{width:8px;height:8px;border-radius:50%;background:#ddd}
+.pdot.done{background:#1a1a1a}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Interview Wingman</h1>
+  <p class="sub">Bluevine interview prep — built for interviewers, not HR.</p>
+  <div class="progress" id="pdots"></div>
+
+  <div class="step active" id="step-0">
+    <p class="sub">Two inputs. I'll tell you everything you need to know.</p>
+    <label>Role</label>
+    <input type="text" id="inp-role" placeholder="e.g. Senior Backend Engineer, Product Manager...">
+    <label>Candidate level</label>
+    <select id="inp-level">
+      <option value="">Select level</option>
+      <optgroup label="P-Track — Individual Contributors">
+        <option value="P1">P1 — Junior</option>
+        <option value="P2">P2 — Developing</option>
+        <option value="P3">P3 — Senior</option>
+        <option value="P4">P4 — Staff</option>
+        <option value="P5">P5 — Principal</option>
+      </optgroup>
+      <optgroup label="M-Track — Managers">
+        <option value="M2">M2 — Team Lead</option>
+        <option value="M3">M3 — Manager</option>
+        <option value="M4">M4 — Senior Manager</option>
+        <option value="M5">M5 — Director</option>
+      </optgroup>
+      <optgroup label="S-Track — Support / Specialist">
+        <option value="S1">S1 — Entry</option>
+        <option value="S2">S2 — Developing</option>
+        <option value="S3">S3 — Experienced</option>
+        <option value="S4">S4 — Senior Specialist</option>
+      </optgroup>
+    </select>
+    <div class="nav-row">
+      <button class="btn btn-primary" onclick="buildPrep()">Show me what to ask</button>
+    </div>
+  </div>
+
+  <div class="step" id="step-1">
+    <div id="prep-out"></div>
+    <hr class="divider">
+    <div class="nav-row">
+      <button class="btn" onclick="goTo(0)">Back</button>
+      <button class="btn btn-primary" onclick="goTo(2)">Interview done — debrief</button>
+    </div>
+  </div>
+
+  <div class="step" id="step-2">
+    <p class="sub">Quick debrief — I'll turn this into a scorecard.</p>
+    <label>Overall impression — would they run with this team?</label>
+    <textarea id="d-vibe" placeholder="Your gut feel after the conversation..."></textarea>
+    <label>Best example they gave — what stood out?</label>
+    <textarea id="d-best" placeholder="A specific moment or story that impressed you..."></textarea>
+    <label>Biggest concern — what's missing or uncertain?</label>
+    <textarea id="d-concern" placeholder="What would you want the next interviewer to probe?"></textarea>
+    <label>Ownership signal — did they drive or wait to be told?</label>
+    <textarea id="d-ownership" placeholder="Specific examples from the conversation..."></textarea>
+    <div class="section-title">Competency ratings</div>
+    <div id="comp-ratings"></div>
+    <div class="section-title">Final recommendation</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+      <button class="score-btn" onclick="setRec('Strong Hire',this)">Strong hire</button>
+      <button class="score-btn" onclick="setRec('Hire',this)">Hire</button>
+      <button class="score-btn" onclick="setRec('No go',this)">No go</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn" onclick="goTo(1)">Back to prep</button>
+      <button class="btn btn-primary" onclick="makeScorecard()">Generate scorecard</button>
+    </div>
+  </div>
+
+  <div class="step" id="step-3">
+    <div class="section-title">Scorecard — ready to paste into Greenhouse</div>
+    <div class="scorecard" id="sc-out"></div>
+    <button class="copy-btn" onclick="copySC()">Copy scorecard</button>
+    <div class="nav-row">
+      <button class="btn" onclick="goTo(2)">Edit debrief</button>
+      <button class="btn btn-primary" onclick="restart()">New interview</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const L={
+  P1:{label:"P1 — Junior",bar:"Task-executor who asks good questions. Not expected to drive independently. You're assessing potential, not track record.",focus:["Curiosity and coachability","Ability to break down problems","Reliability and attitude"],comps:["ownership","collaboration","integrity"],signal:"Look for: intellectual curiosity, handles feedback well, shows up reliably, asks smart questions."},
+  P2:{label:"P2 — Developing",bar:"Starting to work independently on defined work. Should show growing initiative and judgment.",focus:["Handles routine work without guidance","Starting to flag issues proactively","Builds working relationships"],comps:["ownership","collaboration","pushBoundaries"],signal:"Look for: signs of growing ownership, judgment on familiar problems, ability to navigate team dynamics."},
+  P3:{label:"P3 — Senior",bar:"Fully qualified. Owns work end-to-end, solves proactively, influences peers. This is the standard career-level hire.",focus:["Full ownership of projects — no hand-holding","Proactively identifies and solves problems","Cross-functional influence","Works independently day-to-day"],comps:["ownership","pushBoundaries","collaboration"],signal:"Look for: real ownership examples (not 'we did'), cross-functional impact, proactive problem-solving, someone who resets expectations when things go off track."},
+  P4:{label:"P4 — Staff",bar:"Drives complex projects beyond their immediate team. Sets the standard others follow. Shapes direction.",focus:["Drives high-complexity multi-stakeholder work","Designs strategic solutions","Coordinates others and keeps stakeholders informed","Sets the standard others follow"],comps:["ownership","pushBoundaries","message"],signal:"Look for: org-level impact, ability to move things without authority, strategic thinking, evidence they shaped how the team works."},
+  P5:{label:"P5 — Principal",bar:"Organizational-level impact. Defines how things are done. External credibility.",focus:["Shapes company direction","Develops others and holds peers accountable","External-facing credibility in their domain"],comps:["ownership","pushBoundaries","message"],signal:"Look for: influence on company direction, developing others, external recognition, multi-year impact initiatives."},
+  M2:{label:"M2 — Team Lead",bar:"New to formal management. Focused on team execution. Still involved in individual work.",focus:["Assigns tasks and monitors closely","Acts as escalation point","Meets unit targets","Voice for direct reports"],comps:["ownership","collaboration","message"],signal:"Look for: how they give direction, handle underperformers, represent the team upward."},
+  M3:{label:"M3 — Manager",bar:"Experienced manager. Owns team performance. Drives through others.",focus:["Drives team to meet goals","Develops and coaches direct reports","Recommends process improvements"],comps:["ownership","collaboration","pushBoundaries"],signal:"Look for: how they develop people, handle performance issues, create leverage through others vs. doing it themselves."},
+  M4:{label:"M4 — Senior Manager",bar:"Cross-functional influence. Sets team strategy. Manages through other managers.",focus:["Sets operational objectives and delegates","Manages costs, methods, and staffing","Navigates across functions"],comps:["ownership","pushBoundaries","message"],signal:"Look for: organizational navigation, strategic input beyond their team, scalable team-building."},
+  M5:{label:"M5 — Director",bar:"Shapes department strategy and culture. Manages through managers.",focus:["Directs broad functional areas","Influences executive decisions","Drives long-term strategic goals"],comps:["ownership","pushBoundaries","message"],signal:"Look for: long-term thinking, ability to influence executives, org-building at scale."},
+  S1:{label:"S1 — Entry",bar:"Learning the role. Close supervision expected. Assessing potential and attitude.",focus:["Follows instructions reliably","Asks good questions","Shows up consistently"],comps:["ownership","collaboration","integrity"],signal:"Look for: attitude, learning speed, reliability, basic communication."},
+  S2:{label:"S2 — Developing",bar:"Handles routine work independently. Starting to navigate non-standard situations.",focus:["Completes assigned tasks per procedures","Recognizes when to deviate","Builds basic team relationships"],comps:["ownership","collaboration","integrity"],signal:"Look for: improving judgment, process adherence, growing comfort with independence."},
+  S3:{label:"S3 — Experienced",bar:"Owns their domain. Supports junior colleagues. Sets team standard.",focus:["Works independently on moderately complex tasks","First escalation point for junior team members","Identifies systematic issues"],comps:["ownership","collaboration","pushBoundaries"],signal:"Look for: domain depth, reliability under pressure, ability to support others."},
+  S4:{label:"S4 — Senior Specialist",bar:"Informal team leader. Drives improvements. Cross-team influence in their domain.",focus:["Determines own methods and procedures","Drives improvements proactively","Acts as informal team lead"],comps:["ownership","pushBoundaries","message"],signal:"Look for: initiative, strategic thinking within their domain, ability to influence peers."}
+};
+
+const Q={
+  ownership:[
+    {q:"Tell me about a project you owned end-to-end. Walk me through how you took it from start to finish — including the hard parts.",why:"Tests real ownership vs. 'we did this together'. Listen for: did they drive, or were they driven?"},
+    {q:"Describe a time a project you owned started going sideways. What did you do?",why:"Ownership under pressure is more revealing than ownership in smooth conditions."}
+  ],
+  collaboration:[
+    {q:"Tell me about a time you worked closely with someone whose style was very different from yours. How did you handle it?",why:"Tests adaptability and whether they build productive relationships with people unlike them."},
+    {q:"Describe a situation where you disagreed with a teammate or another team. How did you handle it?",why:"Tests conflict navigation and ability to hold a position while maintaining the relationship."}
+  ],
+  pushBoundaries:[
+    {q:"Tell me about a time you noticed something wasn't working well and decided to do something about it.",why:"Tests whether they act on observations or wait for permission."},
+    {q:"Describe a time you introduced a new approach that others weren't familiar with. How did you get people on board?",why:"Tests innovation plus influence — both matter."}
+  ],
+  message:[
+    {q:"Tell me about a time you had to convince people who initially disagreed with you. How did you approach it?",why:"Tests communication and persuasion. At senior levels, this is how things get done."},
+    {q:"Give an example of explaining something complex to a non-technical audience. How did you approach it?",why:"Tests clarity of thought and audience awareness."}
+  ],
+  integrity:[
+    {q:"Tell me about a professional achievement you're genuinely proud of. What did it take to get there?",why:"Reveals what they value and how they define success."},
+    {q:"Tell me about significant feedback you received from a manager or peer. Did you agree? What did you do?",why:"Tests self-awareness and growth mindset. Red flag: blaming others or can't recall feedback."}
+  ]
+};
+
+const CL={ownership:"Operate as owners",collaboration:"Grow together",pushBoundaries:"Push boundaries",message:"Deliver a message",integrity:"Lead with integrity"};
+let st={role:'',level:'',rec:'',scores:{},debrief:{}};
+
+function dots(){
+  const d=document.getElementById('pdots');d.innerHTML='';
+  const cur=+document.querySelector('.step.active').id.split('-')[1];
+  [0,1,2,3].forEach(i=>{const s=document.createElement('div');s.className='pdot'+(i<=cur?' done':'');d.appendChild(s);});
+}
+
+function goTo(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step-'+n).classList.add('active');
+  dots();window.scrollTo(0,0);
+}
+
+function buildPrep(){
+  st.role=document.getElementById('inp-role').value.trim();
+  st.level=document.getElementById('inp-level').value;
+  if(!st.role||!st.level){alert('Please enter the role and level.');return;}
+  const l=L[st.level];
+  let html=`<div class="badge badge-blue">${l.label} — ${st.role}</div>`;
+  html+=`<div class="card"><h3>What the bar looks like at this level</h3><p>${l.bar}</p><div class="highlight">${l.signal}</div></div>`;
+  html+=`<div class="section-title">What to focus on in this interview</div>`;
+  html+=`<div class="card"><ul style="padding-left:1.2rem">`;
+  l.focus.forEach(f=>{html+=`<li style="margin-bottom:6px">${f}</li>`;});
+  html+=`</ul></div>`;
+  html+=`<div class="section-title">Questions to ask</div>`;
+  l.comps.forEach(key=>{
+    html+=`<div style="margin-bottom:1.25rem"><div class="badge badge-teal">${CL[key]}</div>`;
+    Q[key].forEach(item=>{
+      html+=`<div class="q-block"><p>${item.q}</p><p class="why"><strong>Why ask:</strong> ${item.why}</p></div>`;
+    });
+    html+=`</div>`;
+  });
+  document.getElementById('prep-out').innerHTML=html;
+  let rhtml='';
+  l.comps.forEach(key=>{
+    rhtml+=`<div class="score-row"><label>${CL[key]}</label>`;
+    ['Strong','Good','Weak','N/A'].forEach(r=>{
+      rhtml+=`<button class="score-btn" onclick="setScore('${key}','${r}',this)">${r}</button>`;
+    });
+    rhtml+=`</div>`;
+  });
+  document.getElementById('comp-ratings').innerHTML=rhtml;
+  goTo(1);
+}
+
+function setScore(k,v,btn){
+  st.scores[k]=v;
+  btn.closest('.score-row').querySelectorAll('.score-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function setRec(v,btn){
+  st.rec=v;
+  document.querySelectorAll('#step-2 .score-btn').forEach(b=>{if(['Strong hire','Hire','No go'].includes(b.textContent))b.classList.remove('selected');});
+  btn.classList.add('selected');
+}
+
+function makeScorecard(){
+  st.debrief={vibe:document.getElementById('d-vibe').value,best:document.getElementById('d-best').value,concern:document.getElementById('d-concern').value,ownership:document.getElementById('d-ownership').value};
+  const d=new Date().toLocaleDateString('en-GB');
+  const l=L[st.level];
+  let sc=`INTERVIEW SCORECARD — BLUEVINE\n${'─'.repeat(40)}\n`;
+  sc+=`Role: ${st.role}\nLevel: ${st.level} (${l.label})\nDate: ${d}\n\n`;
+  sc+=`OVERALL IMPRESSION\n${st.debrief.vibe||'—'}\n\n`;
+  sc+=`BEST EXAMPLE FROM THE INTERVIEW\n${st.debrief.best||'—'}\n\n`;
+  sc+=`OWNERSHIP SIGNAL\n${st.debrief.ownership||'—'}\n\n`;
+  sc+=`MAIN CONCERN\n${st.debrief.concern||'—'}\n\n`;
+  sc+=`COMPETENCY RATINGS\n`;
+  Object.entries(st.scores).forEach(([k,v])=>{sc+=`  ${CL[k]}: ${v}\n`;});
+  sc+=`\nFINAL RECOMMENDATION: ${st.rec||'Not set'}\n`;
+  sc+=`${'─'.repeat(40)}\nGenerated by Interview Wingman — Bluevine`;
+  document.getElementById('sc-out').textContent=sc;
+  goTo(3);
+}
+
+function copySC(){
+  navigator.clipboard.writeText(document.getElementById('sc-out').textContent).then(()=>{
+    const b=document.querySelector('.copy-btn');b.textContent='Copied!';
+    setTimeout(()=>{b.textContent='Copy scorecard';},2000);
+  });
+}
+
+function restart(){
+  st={role:'',level:'',rec:'',scores:{},debrief:{}};
+  document.getElementById('inp-role').value='';
+  document.getElementById('inp-level').value='';
+  goTo(0);
+}
+
+dots();
+</script>
+</body>
+</html>
